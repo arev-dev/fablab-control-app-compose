@@ -45,7 +45,7 @@ fun DevicesScreen(bluetoothController: BluetoothController) {
             onClick = {
                 selectedDevice?.let {
                     if (bluetoothController.connectToDevice(it)) {
-                       // Toast.makeText(LocalContext.current, "Si jalo", Toast.LENGTH_LONG).show()
+                        // Toast.makeText(LocalContext.current, "Si jalo", Toast.LENGTH_LONG).show()
                         connectionStatus = "Online"
 
                     } else {

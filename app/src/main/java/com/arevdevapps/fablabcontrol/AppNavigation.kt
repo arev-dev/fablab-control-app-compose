@@ -74,7 +74,7 @@ fun AppNavigation(bluetoothController: BluetoothController) {
         ){
             composable(route = Screens.ControllsScreen.name)
             {
-                ControllsScreen()
+                ControllsScreen(bluetoothController)
             }
             composable(route = Screens.HomeScreen.name)
             {

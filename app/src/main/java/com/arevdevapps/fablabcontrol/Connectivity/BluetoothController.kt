@@ -56,6 +56,10 @@ class BluetoothController(private val context: Context) {
         return bluetoothAdapter?.isEnabled == true
     }
 
+    fun isBluetoothConnected(): Boolean {
+        return bluetoothSocket?.isConnected == true
+    }
+
    // @SuppressLint("MissingPermission")
    @SuppressLint("MissingPermission")
    @OptIn(ExperimentalPermissionsApi::class)
@@ -78,13 +82,15 @@ class BluetoothController(private val context: Context) {
         return bluetoothAdapter?.bondedDevices?.toList() ?: emptyList()
     }
 
-    fun disconnect() {
-        try {
+    fun disconnect() : Boolean {
+        return try {
             bluetoothSocket?.close()
             isConnected = false
             selectedDeviceAddress = null
+            true
         } catch (e: IOException) {
             Log.e("BluetoothController", "Error disconnecting: ${e.message}")
+            false
         }
     }
 

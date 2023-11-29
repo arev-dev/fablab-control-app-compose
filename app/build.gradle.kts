@@ -12,7 +12,7 @@ android {
         minSdk = 21
         targetSdk = 33
         versionCode = 1
-        versionName = "1.0"
+        versionName = "0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -62,6 +62,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-permissions:0.29.2-rc")
     implementation("androidx.navigation:navigation-compose:2.5.3")
     implementation("com.google.firebase:firebase-inappmessaging-ktx:20.4.0")
+    //implementation ("com.github.manalkaff:JetStick:v1.2")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
