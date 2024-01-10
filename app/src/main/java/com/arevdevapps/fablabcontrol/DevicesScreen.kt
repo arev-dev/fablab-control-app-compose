@@ -17,115 +17,142 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.arevdevapps.fablabcontrol.Connectivity.BluetoothController
+import com.arevdevapps.fablabcontrol.ui.theme.FablabControlTheme
 
 //@Preview
 @Composable
 fun DevicesScreen(bluetoothController: BluetoothController) {
-    var devices by remember { mutableStateOf<List<BluetoothDevice>>(emptyList()) }
-    var connectionStatus by remember { mutableStateOf<String?>("Desconectado") }
-    var selectedDevice by remember { mutableStateOf<String?>(null) }
-    var commandInput by remember { mutableStateOf(TextFieldValue()) }
-    var isConnected by remember { mutableStateOf(false) }
+    FablabControlTheme{
+        var devices by remember { mutableStateOf<List<BluetoothDevice>>(emptyList()) }
+        var connectionStatus by remember { mutableStateOf<String?>("Desconectado") }
+        var selectedDevice by remember { mutableStateOf<String?>(null) }
+        var commandInput by remember { mutableStateOf(TextFieldValue()) }
+        var isConnected by remember { mutableStateOf(false) }
 
-    // Lógica específica de la pantalla de dispositivos aquí...
-    devices = bluetoothController.getPairedDevices()
-    isConnected = bluetoothController.isBluetoothConnected()
-    connectionStatus = if(isConnected) "Conectado" else "Desconectado"
+        // Lógica específica de la pantalla de dispositivos aquí...
+        devices = bluetoothController.getPairedDevices()
+        isConnected = bluetoothController.isBluetoothConnected()
+        connectionStatus = if(isConnected) "Conectado" else "Desconectado"
 
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ){
-        var isButtonClicked by remember { mutableStateOf(false) }
-        Text("Estado de la conexión: $connectionStatus",
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-                .align(Alignment.CenterHorizontally)
-        )
-
-
-        if(!isConnected)
-        {
-
-            // UI para mostrar la lista de dispositivos emparejados
-            devices.forEach { device ->
-                DeviceItem(device = device, onDeviceSelected = {
-                    isConnected = bluetoothController.connectToDevice(it)
-                    isButtonClicked = true
-                    if(isConnected)
-                    {
-
-                    }
-                    else{
-
-                    }
-
-                })
-            }
-
-        }
-
-        if(isConnected)
-        {
-            Button(
-                onClick = {
-                    bluetoothController.disconnect()
-                },
+                .fillMaxSize()
+                .padding(16.dp)
+        ){
+            var isButtonClicked by remember { mutableStateOf(false) }
+            Text("Dispositivos Vinculados",
+                style = TextStyle(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 25.sp,
+                    textAlign = TextAlign.Center,
+                    color = Color(android.graphics.Color.parseColor("#2E2E2E"))
+                ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp)
-            ) {
-                Text("Desconectar")
-            }
-
-            TextField(
-                value = commandInput,
-                onValueChange = { commandInput = it },
-                label = { Text("Comando") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
+                    .padding(12.dp)
+                    .align(Alignment.CenterHorizontally)
             )
-            Button(
-                onClick = {
-                    val commandText = commandInput.text
-                    if (commandText.isNotEmpty()) {
-                        bluetoothController.sendCommand(commandText)
-                    }
-                },
+            Text("Selecciona el dispositivo al que te vas a conectar",
+                style = TextStyle(
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 15.sp,
+                    textAlign = TextAlign.Center,
+                    color = Color(android.graphics.Color.parseColor("#898989"))
+                ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp)
-            ) {
-                Text("Enviar Comando")
+                    .padding(4.dp)
+                    .align(Alignment.CenterHorizontally)
+            )
+
+            Text("$connectionStatus",
+                style = TextStyle(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                    textAlign = TextAlign.Center,
+                    color = Color(android.graphics.Color.parseColor(if(isConnected) "#38E62D" else "#E62D2D"))
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .align(Alignment.CenterHorizontally)
+            )
+
+
+            if(!isConnected)
+            {
+
+                // UI para mostrar la lista de dispositivos emparejados
+                devices.forEach { device ->
+                    DeviceItem(device = device, onDeviceSelected = {
+                        isConnected = bluetoothController.connectToDevice(it)
+                        isButtonClicked = true
+                        if(isConnected)
+                        {
+
+                        }
+                        else{
+
+                        }
+
+                    })
+                }
+
             }
-        }
 
-
-        //teste
-
-        if(isButtonClicked)
-        {
             if(isConnected)
             {
-                SnackDialog("prueba", "jiji", {isButtonClicked = false})
+                Button(
+                    onClick = {
+                        isConnected = !bluetoothController.disconnect()
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                ) {
+                    Text("Desconectar")
+                }
+
+                TextField(
+                    value = commandInput,
+                    onValueChange = { commandInput = it },
+                    label = { Text("Comando") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                )
+                Button(
+                    onClick = {
+                        val commandText = commandInput.text
+                        if (commandText.isNotEmpty()) {
+                            bluetoothController.sendCommand(commandText)
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                ) {
+                    Text("Enviar Comando")
+                }
             }
+
         }
 
     }
-
 }
 
 @SuppressLint("MissingPermission")
 @Composable
 fun DeviceItem(device: BluetoothDevice, onDeviceSelected: (String) -> Unit) {
     Card(
+        colors = CardDefaults.cardColors(
+            containerColor = Color(android.graphics.Color.parseColor("#2D5FE6")),
+        ),
         modifier = Modifier
             .fillMaxWidth()
             .padding(4.dp)
@@ -137,36 +164,13 @@ fun DeviceItem(device: BluetoothDevice, onDeviceSelected: (String) -> Unit) {
         ) {
             Text(
                 text = device.name ?: "Dispostivo Desconocido",
-                style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.White)
             )
             //Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = device.address,
-                style = TextStyle(color = Color.Gray)
+                style = TextStyle(color = Color(android.graphics.Color.parseColor("#C4D4FF")),)
             )
-        }
-    }
-}
-
-@Composable
-fun SnackDialog(buttonText: String, messageText: String, onClickAction: () -> Unit) {
-    SnackbarHost(
-        hostState = remember { SnackbarHostState() },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-    ) {
-        Snackbar(
-            action = {
-                TextButton(onClick = onClickAction) {
-                    Text(buttonText)
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(22.dp)
-        ) {
-            Text(messageText)
         }
     }
 }

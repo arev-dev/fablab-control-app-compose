@@ -66,6 +66,10 @@ class BluetoothController(private val context: Context) {
         return bluetoothAdapter?.bondedDevices?.toList() ?: emptyList()
     }
 
+    fun getDeviceConnected(): BluetoothDevice? {
+        return bluetoothSocket?.remoteDevice
+    }
+
     fun disconnect() : Boolean {
         return try {
             bluetoothSocket?.close()
