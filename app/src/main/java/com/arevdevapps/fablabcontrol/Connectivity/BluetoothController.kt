@@ -35,25 +35,13 @@ class BluetoothController(private val context: Context) {
         val MY_UUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
     }
 
-    fun checkBluetoothPermissions(): Boolean {
-        return ActivityCompat.checkSelfPermission(
-            context,
-            Manifest.permission.BLUETOOTH_CONNECT
-        ) == PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ) == PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) == PackageManager.PERMISSION_GRANTED
-    }
-
-
 
     fun isBluetoothEnabled(): Boolean {
         return bluetoothAdapter?.isEnabled == true
+    }
+
+    fun isBluetoothConnected(): Boolean {
+        return bluetoothSocket?.isConnected == true
     }
 
    // @SuppressLint("MissingPermission")
@@ -78,13 +66,19 @@ class BluetoothController(private val context: Context) {
         return bluetoothAdapter?.bondedDevices?.toList() ?: emptyList()
     }
 
-    fun disconnect() {
-        try {
+    fun getDeviceConnected(): BluetoothDevice? {
+        return bluetoothSocket?.remoteDevice
+    }
+
+    fun disconnect() : Boolean {
+        return try {
             bluetoothSocket?.close()
             isConnected = false
             selectedDeviceAddress = null
+            true
         } catch (e: IOException) {
             Log.e("BluetoothController", "Error disconnecting: ${e.message}")
+            false
         }
     }
 
